@@ -12,12 +12,7 @@ class App extends React.Component {
     showEllipsis: true,
     showFirstAndLastNav: true,
     showPreviousAndNextNav: true,
-  }
-
-  onFileChange = (event) => {
-    this.setState({
-      file: event.target.files[0]
-    });
+    scale:1,
   }
 
   onDocumentLoadSuccess = ({ numPages }) => {
@@ -26,35 +21,16 @@ class App extends React.Component {
 
   handlePaginationChange = (e, { activePage }) => this.setState({ activePage })
 
-  nextPage = () => {
-
-    const currentPageNumber = this.state.pageNumber;
-    let nextPageNumber;
-
-    if (currentPageNumber + 1 > this.state.numPages) {
-      nextPageNumber = 1;
-    } else {
-      nextPageNumber = currentPageNumber + 1;
-    }
-
-    this.setState({
-      pageNumber: nextPageNumber
-    });
+  scaleIt = () => {
+    const currentScale = this.state.scale
+    const scale = currentScale + 0.1
+    this.setState({ scale })
   }
-  prevPage = () => {
 
-    const currentPageNumber = this.state.pageNumber;
-    let prevPageNumber;
-
-    if (currentPageNumber - 1 < 0) {
-      prevPageNumber = 1;
-    } else {
-      prevPageNumber = currentPageNumber - 1;
-    }
-
-    this.setState({
-      pageNumber: prevPageNumber
-    });
+  descaleIt = () => {
+    const currentScale = this.state.scale
+    const scale = currentScale - 0.1
+    this.setState({ scale })
   }
 
   render() {
@@ -63,30 +39,42 @@ class App extends React.Component {
       showEllipsis,
       showFirstAndLastNav,
       showPreviousAndNextNav,
-      numPages
+      numPages,
+      scale
     } = this.state
     return (
       <Container>
-        <Grid centered columns={2}>
-          <Grid.Column textAlign="center" onClick={this.nextPage}>
-          
-          {this.state.file ? <Pagination
-            activePage={activePage}
-            onPageChange={this.handlePaginationChange}
-            size='mini'
-            totalPages={numPages}
-            // Heads up! All items are powered by shorthands, if you want to hide one of them, just pass `null` as value
-            ellipsisItem={showEllipsis ? undefined : null}
-            firstItem={showFirstAndLastNav ? undefined : null}
-            lastItem={showFirstAndLastNav ? undefined : null}
-            prevItem={showPreviousAndNextNav ? undefined : null}
-            nextItem={showPreviousAndNextNav ? undefined : null}
-          /> : null}
-
+        <Grid centered rows={2}>
+          <Grid.Row textAlign="center">
+            <Grid centered columns={2}>
+              <Grid.Column textAlign="right" width="10">
+              {this.state.file ? <Pagination
+                activePage={activePage}
+                onPageChange={this.handlePaginationChange}
+                size='mini'
+                totalPages={numPages}
+                // Heads up! All items are powered by shorthands, if you want to hide one of them, just pass `null` as value
+                ellipsisItem={showEllipsis ? undefined : null}
+                firstItem={showFirstAndLastNav ? undefined : null}
+                lastItem={showFirstAndLastNav ? undefined : null}
+                prevItem={showPreviousAndNextNav ? undefined : null}
+                nextItem={showPreviousAndNextNav ? undefined : null}
+                /> : null}
+                </Grid.Column>
+                <Grid.Column textAlign="left" width="6">
+                <div class="ui buttons">
+                  <button class="ui button" onClick={this.scaleIt}>+</button>
+                  <div class="or" data-text="/"></div>
+                  <button class="ui button" onClick={this.descaleIt}>-</button>
+                </div>
+              </Grid.Column>
+            </Grid>
+          </Grid.Row>
+          <Grid.Row textAlign="center">
             <Document file={this.state.file} onLoadSuccess={this.onDocumentLoadSuccess} noData={<h4>Please select a file</h4>}>
-              <Page pageNumber={activePage} />
+              <Page pageNumber={activePage} scale={scale}/>
             </Document>
-          </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Container>
     );
